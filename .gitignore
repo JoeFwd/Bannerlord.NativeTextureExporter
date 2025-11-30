@@ -1,0 +1,27 @@
+# Visual Studio
+.vs/
+# Build results
+bin/
+obj/
+# Rider
+.idea/
+# VS Code
+.vscode/
+# User‑specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+# Build logs
+*.log
+# NuGet packages
+*.nupkg
+# Packages folder
+packages/
+# ReSharper
+*.DotSettings.user
+# Auto‑generated files
+*.generated.cs
+# Miscellaneous
+*.vspscc
+*.vssscc
