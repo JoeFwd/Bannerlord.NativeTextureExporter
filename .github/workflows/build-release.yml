@@ -23,10 +23,14 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build -c Release --no-restore
+      run: dotnet build ./Bannerlord.NativeTextureExporter/Bannerlord.NativeTextureExporter.csproj -c Release --no-restore
+    - name: Build Tests
+      run: dotnet build ./Bannerlord.NativeTextureExporter.Tests/Bannerlord.NativeTextureExporter.Tests.csproj -c Release --no-restore
 
+    - name: Test
+      run: dotnet test ./Bannerlord.NativeTextureExporter.Tests/Bannerlord.NativeTextureExporter.Tests.csproj --no-build --configuration Release
     - name: Publish self-contained exe
-      run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+      run: dotnet publish ./Bannerlord.NativeTextureExporter/Bannerlord.NativeTextureExporter.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -o publish
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
@@ -37,7 +41,7 @@ jobs:
     - name: Get Project Version
       id: get_version
       run: |
-        $xml = [xml](Get-Content ${{ github.workspace }}/Bannerlord.NativeTextureExporter.csproj)
+        $xml = [xml](Get-Content ${{ github.workspace }}/Bannerlord.NativeTextureExporter/Bannerlord.NativeTextureExporter.csproj)
         Write-Output "VERSION=$($xml.Project.PropertyGroup.Version)" >> $env:GITHUB_OUTPUT
     - name: Create Release
       id: create_release

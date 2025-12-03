@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bannerlord.NativeTextureExporter", "Bannerlord.NativeTextureExporter\Bannerlord.NativeTextureExporter.csproj", "{F32A5813-99AF-4F50-A28C-FF26028C21DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bannerlord.NativeTextureExporter.Tests", "Bannerlord.NativeTextureExporter.Tests\Bannerlord.NativeTextureExporter.Tests.csproj", "{2882EF13-C0F3-43E6-AC85-5987922B6CEC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{DADC94E8-C271-4DCE-B565-285CC4DDDC61}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-release.yml = .github\workflows\build-release.yml
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F32A5813-99AF-4F50-A28C-FF26028C21DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F32A5813-99AF-4F50-A28C-FF26028C21DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F32A5813-99AF-4F50-A28C-FF26028C21DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F32A5813-99AF-4F50-A28C-FF26028C21DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2882EF13-C0F3-43E6-AC85-5987922B6CEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2882EF13-C0F3-43E6-AC85-5987922B6CEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2882EF13-C0F3-43E6-AC85-5987922B6CEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2882EF13-C0F3-43E6-AC85-5987922B6CEC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
