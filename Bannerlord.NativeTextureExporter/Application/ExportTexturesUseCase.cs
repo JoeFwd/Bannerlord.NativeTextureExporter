@@ -32,12 +32,16 @@ public class ExportTexturesUseCase : IExportTexturesUseCase
 
         _tpacWrapper.Load(nativeFolder);
         Dictionary<string, Material> nativeMaterials = _tpacWrapper.GetLoadedMaterials();
+        // Also capture standalone textures loaded from the native folder (e.g. AssetPackages/ tpac
+        // files that embed pixel data without an accompanying material).  These must be recorded
+        // now, before the mod load overwrites the AssetManager's view of loaded textures.
+        Dictionary<string, Texture> nativeTextures = _tpacWrapper.GetLoadedTextures();
         _tpacWrapper.Load(modFolder);
 
         Console.WriteLine($"Finding native textures used in materials in folder '{modFolder}'");
 
         Dictionary<string, Material> allMaterialByGuids = _tpacWrapper.GetLoadedMaterials();
-        ISet<string> textureGuids = GetNativeTexturesUsedInModMaterials(allMaterialByGuids, nativeMaterials);
+        ISet<string> textureGuids = GetNativeTexturesUsedInModMaterials(allMaterialByGuids, nativeMaterials, nativeTextures);
 
         ISet<string> textureGuidsToExport = new HashSet<string>(textureGuids);
 
@@ -45,18 +49,41 @@ public class ExportTexturesUseCase : IExportTexturesUseCase
             textureGuidsToExport.UnionWith(
                 _sceneTextureExtractorUtil.ExtractNativeTextures(modFolder, nativeMaterials));
 
-        ExportSelectedNativeTextures(GetTexturesByGuids(nativeMaterials), textureGuidsToExport, modFolder);
+        ExportSelectedNativeTextures(
+            MergeNativeTextures(nativeMaterials, nativeTextures),
+            textureGuidsToExport,
+            modFolder);
 
         Console.WriteLine("All textures have been exported!");
     }
 
-    private static Dictionary<string, Texture> GetTexturesByGuids(
-        Dictionary<string, Material> nativeMaterialByGuids)
+    /// <summary>
+    ///     Builds a unified GUID → <see cref="Texture" /> map from two sources:
+    ///     textures referenced by native materials, and standalone textures that were
+    ///     loaded directly from the native folder (e.g. from packed <c>AssetPackages/</c>
+    ///     tpac files that contain no material).  Standalone textures are included first
+    ///     so that their pixel-data-bearing representations are preferred over any duplicate
+    ///     stubs that might exist in material-referenced texture lists.
+    /// </summary>
+    private static Dictionary<string, Texture> MergeNativeTextures(
+        Dictionary<string, Material> nativeMaterials,
+        Dictionary<string, Texture> standaloneNativeTextures)
     {
-        return nativeMaterialByGuids
-            .Values.SelectMany(material => material.Textures)
-            .GroupBy(texture => texture.Key)
-            .ToDictionary(kv => kv.Key, kv => kv.First().Value);
+        // Start from standalone (pixel-data-bearing) textures.
+        var merged = new Dictionary<string, Texture>(standaloneNativeTextures,
+            StringComparer.OrdinalIgnoreCase);
+
+        // Add material-referenced textures that are not yet in the map.
+        foreach (var kv in nativeMaterials
+                     .Values
+                     .SelectMany(m => m.Textures)
+                     .GroupBy(t => t.Key)
+                     .Select(g => g.First()))
+        {
+            merged.TryAdd(kv.Key, kv.Value);
+        }
+
+        return merged;
     }
 
     private void ExportSelectedNativeTextures(
@@ -97,17 +124,18 @@ public class ExportTexturesUseCase : IExportTexturesUseCase
 
     private static ISet<string> GetNativeTexturesUsedInModMaterials(
         Dictionary<string, Material> allAssetsByGuids,
-        Dictionary<string, Material> nativeMaterialByGuids)
+        Dictionary<string, Material> nativeMaterialByGuids,
+        Dictionary<string, Texture> standaloneNativeTextures)
     {
         List<Material> modMaterials = allAssetsByGuids.Values
             .Where(m => !nativeMaterialByGuids.ContainsKey(m.Guid.ToString())).ToList();
 
         modMaterials.ForEach(m => Console.WriteLine($"Found material '{m.Name}'"));
 
-        Dictionary<string, Texture> nativeTextures = nativeMaterialByGuids.Values
-            .SelectMany(material => material.Textures.Values)
-            .GroupBy(texture => texture.Guid.ToString())
-            .ToDictionary(tex => tex.Key, tex => tex.First());
+        // Derive native texture GUIDs from both material-referenced textures AND standalone
+        // packed textures (e.g. from AssetPackages/ files that have no material wrapper).
+        Dictionary<string, Texture> nativeTextures = MergeNativeTextures(
+            nativeMaterialByGuids, standaloneNativeTextures);
 
         ISet<string> textureGuids = modMaterials
             .SelectMany(m => m.Textures.Values)

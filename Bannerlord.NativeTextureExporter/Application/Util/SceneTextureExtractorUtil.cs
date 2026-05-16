@@ -20,7 +20,7 @@ public class SceneTextureExtractorUtil
     ///     Returns distinct texture GUIDs referenced by native materials used in .xscene files.
     /// </summary>
     /// <param name="modFolder">Root folder of the mod (contains AssetSources folder).</param>
-    /// <param name="nativeAssetByGuids">Dictionary of native assets keyed by GUID.</param>
+    /// <param name="nativeAssetByGuids">Dictionary of native materials keyed by GUID.</param>
     /// <returns>HashSet of unique texture GUID strings.</returns>
     public ISet<string> ExtractNativeTextures(
         string modFolder,

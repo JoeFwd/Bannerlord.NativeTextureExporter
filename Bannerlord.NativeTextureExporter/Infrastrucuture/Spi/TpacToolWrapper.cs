@@ -21,6 +21,16 @@ public class TpacToolWrapper : ITpacToolWrapper
         _assetManager.Load(new DirectoryInfo(folderPath));
     }
 
+    /// <inheritdoc />
+    public Dictionary<string, Texture> GetLoadedTextures()
+    {
+        return _assetManager.LoadedAssets
+            .OfType<TpacTool.Lib.Texture>()
+            .Select(MapEntityTextureToDomain)
+            .GroupBy(t => t.Guid.ToString())
+            .ToDictionary(g => g.Key, g => g.First());
+    }
+
     public Dictionary<string, Material> GetLoadedMaterials()
     {
         Dictionary<Guid, Texture> loadedTexturesByGuid = _assetManager.LoadedAssets

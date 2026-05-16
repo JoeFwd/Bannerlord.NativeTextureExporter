@@ -36,4 +36,12 @@
             <HintPath>..\libs\LZ4.dll</HintPath>
         </Reference>
     </ItemGroup>
+
+    <!-- Integration test fixture tpac files – copied to output so tests can locate them
+         via TestContext.CurrentContext.TestDirectory at runtime. -->
+    <ItemGroup>
+        <Content Include="Integration\TestFixtures\**\*.tpac">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 </Project>

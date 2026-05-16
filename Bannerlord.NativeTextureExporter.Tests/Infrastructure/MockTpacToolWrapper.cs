@@ -18,6 +18,11 @@ public class MockTpacToolWrapper : ITpacToolWrapper
         return new Dictionary<string, Material>();
     }
 
+    public Dictionary<string, Texture> GetLoadedTextures()
+    {
+        return new Dictionary<string, Texture>();
+    }
+
     public string ExportTexture(Texture texture, string targetDir)
     {
         return "";
