@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
@@ -43,6 +45,35 @@ jobs:
       run: |
         $xml = [xml](Get-Content ${{ github.workspace }}/Bannerlord.NativeTextureExporter/Bannerlord.NativeTextureExporter.csproj)
         Write-Output "VERSION=$($xml.Project.PropertyGroup.Version)" >> $env:GITHUB_OUTPUT
+    - name: Generate Changelog
+      run: |
+        $version = "${{ steps.get_version.outputs.VERSION }}"
+        $currentTag = $version
+        $previousTag = git tag --sort=-creatordate | Where-Object { $_ -ne $currentTag } | Select-Object -First 1
+
+        if ([string]::IsNullOrWhiteSpace($previousTag)) {
+          $range = "HEAD"
+          $rangeText = "Full history"
+        } else {
+          $range = "$previousTag..HEAD"
+          $rangeText = "Changes since $previousTag"
+        }
+
+        $commits = git log $range --pretty=format:"- %s (%h)"
+        if ([string]::IsNullOrWhiteSpace($commits)) {
+          $commits = "- No commits found."
+        }
+
+        @(
+          "# Release $version"
+          ""
+          $rangeText
+          ""
+          "## Changes"
+          ""
+          $commits
+        ) | Set-Content -Path "${{ github.workspace }}/release-changelog.md" -Encoding UTF8
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -51,6 +82,7 @@ jobs:
       with:
         tag_name: ${{ steps.get_version.outputs.VERSION }}
         release_name: Release ${{ steps.get_version.outputs.VERSION }}
+        body_path: ${{ github.workspace }}/release-changelog.md
         draft: false
         prerelease: false
 
