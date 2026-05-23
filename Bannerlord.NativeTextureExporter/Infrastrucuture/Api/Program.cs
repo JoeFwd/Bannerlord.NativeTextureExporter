@@ -17,6 +17,7 @@ public static class Program
         services.AddSingleton<IExportTexturesUseCase, ExportTexturesUseCase>();
         services.AddSingleton<IArgumentValidator, ArgumentValidator>();
         services.AddSingleton<GetExportTextureFolderPathUtil>();
+        services.AddSingleton<NativeTextureOverrideFilterUtil>();
         services.AddSingleton<SceneTextureExtractorUtil>();
         services.AddSingleton<ExportTextureRequestMapper>();
 

@@ -15,6 +15,7 @@ textures into the mod. Primarily intended as a quick fix for black textures that
   references in meshes. The textures of those materials are flagged for export.
 - Copies the required native textures (DDS or PNG) into `<ModFolder>/AssetSources/vanilla_texture_reimports`.
 - Ignores textures that have already been exported to avoid duplicates.
+- Does not export native textures that are overridden by the mod.
 
 ## Prerequisites
 
